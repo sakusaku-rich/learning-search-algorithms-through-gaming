@@ -1,5 +1,8 @@
 using Random: seed!, rand
 
+const DX = [1, -1, 0, 0]
+const DY = [0, 0, 1, -1]
+
 mutable struct Coord
     x::Int
     y::Int
@@ -13,14 +16,12 @@ mutable struct MazeState
     end_turn::Int
     turn::Int
     game_score::Int
-    dx::Vector{Int} 
-    dy::Vector{Int}
 
     function MazeState(seed::Int, h::Int, w::Int, end_turn::Int)
         seed!(seed)
         character = Coord(
-            mod(rand(Int, 1)[1], h),
-            mod(rand(Int, 1)[1], w)
+            mod(rand(Int, 1)[1], h) + 1,
+            mod(rand(Int, 1)[1], w) + 1
         )
         points = zeros(Int, h, w)
         for i in 1:h
@@ -30,28 +31,28 @@ mutable struct MazeState
                 end
             end
         end
-        new(points, character, h, w, end_turn, 0,  0, [1, -1, 0, 0], [0, 0, 1, -1])
+        new(points, character, h, w, end_turn, 0,  0)
     end
 end
 
-function is_done(state::MazeState, end_turn::Int)
+function is_done(state::MazeState, end_turn::Int)::Bool
     state.turn == end_turn
 end
 
 function advance!(state::MazeState, action::Int)
-    state.character.x += state.dx[action]
-    state.character.y += state.dy[action]
+    state.character.x += DX[action]
+    state.character.y += DY[action]
     p = state.points[state.character.x, state.character.y]
     state.game_score += p
     state.points[state.character.x, state.character.y] = 0
     state.turn += 1
 end
 
-function legal_actions(state::MazeState) 
+function legal_actions(state::MazeState)::Vector{Int}
     actions = []
     for i in 1:4
-        tx = state.character.x + state.dx[i]
-        ty = state.character.y + state.dy[i]
+        tx = state.character.x + DX[i]
+        ty = state.character.y + DY[i]
         if tx >= 1 && tx <= state.h && ty >= 1 && ty <= state.w
             push!(actions, i)
         end
@@ -59,7 +60,7 @@ function legal_actions(state::MazeState)
     actions
 end
 
-function to_string(state::MazeState)
+function to_string(state::MazeState)::String
     ss = ""
     ss *= "turn:\t$(state.turn)\n"
     ss *= "score:\t$(state.game_score)\n\n"
@@ -79,9 +80,8 @@ function to_string(state::MazeState)
     ss
 end
 
-function random_action(state::MazeState)
-    la = legal_actions(state)
-    la[rand(1:length(la))]
+function random_action(state::MazeState)::Int
+    rand(legal_actions(state))
 end
 
 function play_game(seed::Int, h::Int, w::Int, end_turn::Int)
@@ -94,6 +94,4 @@ function play_game(seed::Int, h::Int, w::Int, end_turn::Int)
     end
 end
 
-# function main()
 play_game(0, 3, 4, 10)
-# end
