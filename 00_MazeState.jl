@@ -93,5 +93,3 @@ function play_game(seed::Int, h::Int, w::Int, end_turn::Int)
         print(to_string(state))
     end
 end
-
-play_game(0, 3, 4, 10)
