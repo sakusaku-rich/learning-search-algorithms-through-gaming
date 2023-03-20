@@ -1,7 +1,8 @@
 using Random: seed!, rand
 
 const INF = 1e9
-
+const DX = [1, -1, 0, 0]
+const DY = [0, 0, 1, -1]
 
 mutable struct Coord
     x::Int
@@ -16,8 +17,6 @@ mutable struct MazeState
     end_turn::Int
     turn::Int
     game_score::Int
-    dx::Vector{Int} 
-    dy::Vector{Int}
     evaluated_score::Int
 
     function MazeState(seed::Int, h::Int, w::Int, end_turn::Int)
@@ -34,7 +33,7 @@ mutable struct MazeState
                 end
             end
         end
-        new(points, character, h, w, end_turn, 0,  0, [1, -1, 0, 0], [0, 0, 1, -1], 0)
+        new(points, character, h, w, end_turn, 0,  0, 0)
     end
 end
 
@@ -47,8 +46,8 @@ function is_done(state::MazeState, end_turn::Int)::Bool
 end
 
 function advance!(state::MazeState, action::Int)
-    state.character.x += state.dx[action]
-    state.character.y += state.dy[action]
+    state.character.x += DX[action]
+    state.character.y += DY[action]
     p = state.points[state.character.x, state.character.y]
     state.game_score += p
     state.points[state.character.x, state.character.y] = 0
@@ -58,8 +57,8 @@ end
 function legal_actions(state::MazeState)::Vector{Int}
     actions = []
     for i in 1:4
-        tx = state.character.x + state.dx[i]
-        ty = state.character.y + state.dy[i]
+        tx = state.character.x + DX[i]
+        ty = state.character.y + DY[i]
         if tx >= 1 && tx <= state.h && ty >= 1 && ty <= state.w
             push!(actions, i)
         end
