@@ -41,8 +41,8 @@ function operator(state1::MazeState, state2::MazeState)::Bool
     state1.evaluated_score < state2.evaluated_score
 end
 
-function is_done(state::MazeState, end_turn::Int)::Bool
-    state.turn == end_turn
+function is_done(state::MazeState)::Bool
+    state.turn == state.end_turn
 end
 
 function advance!(state::MazeState, action::Int)
@@ -115,7 +115,7 @@ function beam_search_action(state::MazeState, beam_width::Int, beam_depth::Int):
         now_beam = sort(next_beam, by=state->state.evaluated_score, rev=true)
         best_state = now_beam[1]
 
-        if is_done(best_state, state.end_turn)
+        if is_done(best_state)
             break
         end
     end
@@ -125,7 +125,7 @@ end
 function play_game(seed::Int, h::Int, w::Int, end_turn::Int)
     state = MazeState(seed, h, w, end_turn)
     print(to_string(state))
-    while !is_done(state, end_turn)
+    while !is_done(state)
         action = random_action(state)
         advance!(state, action)
         print(to_string(state))
@@ -136,7 +136,7 @@ function test_ai_score(game_number::Int)
     score_mean = 0.0
     for seed in 1:game_number
         state = MazeState(seed, 3, 4, 4)
-        while !is_done(state, state.end_turn)
+        while !is_done(state)
             action = beam_search_action(state, 10, 4)
             advance!(state, action)
         end

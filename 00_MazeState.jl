@@ -35,8 +35,8 @@ mutable struct MazeState
     end
 end
 
-function is_done(state::MazeState, end_turn::Int)::Bool
-    state.turn == end_turn
+function is_done(state::MazeState)::Bool
+    state.turn == state.end_turn
 end
 
 function advance!(state::MazeState, action::Int)
@@ -87,7 +87,7 @@ end
 function play_game(seed::Int, h::Int, w::Int, end_turn::Int)
     state = MazeState(seed, h, w, end_turn)
     print(to_string(state))
-    while !is_done(state, end_turn)
+    while !is_done(state)
         action = random_action(state)
         advance!(state, action)
         print(to_string(state))
