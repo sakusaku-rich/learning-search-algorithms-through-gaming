@@ -95,7 +95,7 @@ function beam_search_action_with_time_threshold(state::MazeState, beam_width::In
     time_keeper = TimeKeeper(time_threshold)
     now_beam = [state]
     best_state = state
-    for t in 1:state.end_turn
+    for t in Iterators.countfrom()
         next_beam = []
         for i in 1:beam_width
             if is_time_over(time_keeper)
