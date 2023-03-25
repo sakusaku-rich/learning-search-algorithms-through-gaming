@@ -85,14 +85,14 @@ end
 function get_winning_status(state::AlternateMazeState)::Int
     if is_done(state)
         if state.characters[1].game_score > state.characters[2].game_score
-            1
+            return 1
         elseif state.characters[1].game_score < state.characters[2].game_score
-            2
+            return 2
         else
-            0
+            return 0
         end
     else
-        -1
+        return -1
     end
 end
 
@@ -186,18 +186,18 @@ function get_first_player_score_for_win_rate(state::AlternateMazeState)::Float64
     winnnig_status = get_winning_status(state)
     if winnnig_status == 1
         if is_first_player(state)
-            1.0
+            return 1.0
         else
-            0.0
+            return 0.0
         end
     elseif winnnig_status == 2
         if is_first_player(state)
-            0.0
+            return 0.0
         else
-            1.0
+            return 1.0
         end
     else
-        0.5
+        return 0.5
     end
 end
 
@@ -288,7 +288,7 @@ function alpha_beta_score(state::AlternateMazeState, alpha::Int, beta::Int, dept
             alpha = score
         end
         if alpha >= beta
-            alpha
+            return alpha
         end
     end
     alpha

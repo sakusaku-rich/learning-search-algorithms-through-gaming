@@ -199,18 +199,18 @@ function get_first_player_score_for_win_rate(state::AlternateMazeState)::Float64
     winnnig_status = get_winning_status(state)
     if winnnig_status == 1
         if is_first_player(state)
-            1.0
+            return 1.0
         else
-            0.0
+            return 0.0
         end
     elseif winnnig_status == 2
         if is_first_player(state)
-            0.0
+            return 0.0
         else
-            1.0
+            return 1.0
         end
     else
-        0.5
+        return 0.5
     end
 end
 
@@ -287,7 +287,7 @@ end
 
 function alpha_beta_score(state::AlternateMazeState, alpha::Int, beta::Int, depth::Int, time_keeper::TimeKeeper)::Int
     if is_time_over(time_keeper)
-        1
+        return 1
     end
     if is_done(state) || depth == 0
         return get_score(state)
@@ -304,10 +304,10 @@ function alpha_beta_score(state::AlternateMazeState, alpha::Int, beta::Int, dept
             alpha = score
         end
         if alpha >= beta
-            alpha
+            return alpha
         end
         if is_time_over(time_keeper)
-            1
+            return 1
         end
     end
     alpha
@@ -326,7 +326,7 @@ function alpha_beta_action_with_time_threshold(state::AlternateMazeState, depth:
             alpha = score
         end
         if is_time_over(time_keeper)
-            1
+            return 1
         end
     end
     best_action

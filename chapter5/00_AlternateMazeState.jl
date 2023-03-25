@@ -85,14 +85,14 @@ end
 function get_winning_status(state::AlternateMazeState)::Int
     if is_done(state)
         if state.characters[1].game_score > state.characters[2].game_score
-            1
+            return 1
         elseif state.characters[1].game_score < state.characters[2].game_score
-            2
+            return 2
         else
-            0
+            return 0
         end
     else
-        -1
+        return -1
     end
 end
 
