@@ -371,7 +371,7 @@ end
 
 states = get_sample_states(100)
 ais = [
-    "iterative_deepening_action 100" => stete -> iterative_deepening_action(stete, 100),
-    "iterative_deepening_action 1" => stete -> iterative_deepening_action(stete, 1),
+    "iterative_deepening_action 100" => state -> iterative_deepening_action(state, 100),
+    "iterative_deepening_action 1" => state -> iterative_deepening_action(state, 1),
 ]
 test_first_player_win_rate(ais, 100)
