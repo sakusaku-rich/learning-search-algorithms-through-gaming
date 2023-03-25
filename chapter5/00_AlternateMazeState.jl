@@ -75,7 +75,7 @@ function legal_actions(state::AlternateMazeState)::Vector{Int}
     for action in 1:4
         tx = character.x + DX[action]
         ty = character.y + DY[action]
-        if tx >= 1 && tx <= W & ty >= 1 & ty <= H
+        if tx >= 1 && tx <= W && ty >= 1 && ty <= H
             push!(actions, action)
         end
     end
