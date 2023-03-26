@@ -2,7 +2,7 @@ include("12_ThunderSearch.jl")
 
 module ThunderSearchActionWithTimeThreshold
 
-using ..AlternateMazeStateGame: AlternateMazeState, advance!, to_string, is_done, get_winning_status, legal_actions
+using ..AlternateMazeGame: AlternateMazeState, advance!, to_string, is_done, get_winning_status, legal_actions
 using ..RandomAction: random_action
 using ..MCTSAction: Node, expand!
 using ..Util: TimeKeeper, is_time_over
@@ -35,7 +35,7 @@ end
 end
 
 module MCTSActionWithTimeThreshold
-using ..AlternateMazeStateGame: AlternateMazeState, advance!, to_string, is_done, get_winning_status, legal_actions
+using ..AlternateMazeGame: AlternateMazeState, advance!, to_string, is_done, get_winning_status, legal_actions
 using ..RandomAction: random_action
 using ..MCTSAction: Node, expand!, next_child_node, playout
 using ..Util: TimeKeeper, is_time_over

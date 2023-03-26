@@ -2,7 +2,7 @@ include("./11_PrintTree_3000.jl")
 
 module ThunderSearchAction
 
-using ..AlternateMazeStateGame: AlternateMazeState, advance!, to_string, is_done, get_winning_status, legal_actions
+using ..AlternateMazeGame: AlternateMazeState, advance!, to_string, is_done, get_winning_status, legal_actions
 using ..RandomAction: random_action
 using ..MCTSAction: Node
 

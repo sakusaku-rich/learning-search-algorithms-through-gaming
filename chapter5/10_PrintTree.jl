@@ -2,7 +2,7 @@ include("./09_MCTSPlayoutNumber.jl")
 
 module MCTSActionWithPrintTree
 
-using ..AlternateMazeStateGame: AlternateMazeState, advance!, to_string, is_done, get_winning_status, legal_actions
+using ..AlternateMazeGame: AlternateMazeState, advance!, to_string, is_done, get_winning_status, legal_actions
 using ..RandomAction: random_action
 using ..MCTSAction: Node
 
@@ -155,5 +155,5 @@ end
 
 end
 
-# state = AlternateMazeStateGame.AlternateMazeState(1, 5, 5, 10)
+# state = AlternateMazeGame.AlternateMazeState(1, 5, 5, 10)
 # MCTSActionWithPrintTree.mcts_action(state, 30, 10, 1.0, true)

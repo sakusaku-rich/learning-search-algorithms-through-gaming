@@ -20,7 +20,7 @@ end
 
 
 module IterativeDeepeningAction
-using ..AlternateMazeStateGame: AlternateMazeState, advance!, to_string, is_done, get_winning_status, legal_actions
+using ..AlternateMazeGame: AlternateMazeState, advance!, to_string, is_done, get_winning_status, legal_actions
 using ..Util: TimeKeeper, is_time_over
 using Dates: now, Millisecond, DateTime
 

@@ -2,7 +2,7 @@
 include("./01_MiniMax.jl")
 
 module TestFirstPlayerWinRate
-using ..AlternateMazeStateGame: AlternateMazeState, advance!, to_string, is_done, get_winning_status, legal_actions
+using ..AlternateMazeGame: AlternateMazeState, advance!, to_string, is_done, get_winning_status, legal_actions
 using ..MiniMaxAction: mini_max_action
 
 function is_first_player(state::AlternateMazeState)::Bool

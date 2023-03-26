@@ -2,7 +2,7 @@ include("./07_PrimitiveMontecarloPlayoutNumber.jl")
 
 module MCTSAction
 
-using ..AlternateMazeStateGame: AlternateMazeState, advance!, to_string, is_done, get_winning_status, legal_actions
+using ..AlternateMazeGame: AlternateMazeState, advance!, to_string, is_done, get_winning_status, legal_actions
 using ..RandomAction: random_action
 
 mutable struct Node

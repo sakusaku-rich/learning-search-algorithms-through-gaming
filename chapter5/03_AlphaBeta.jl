@@ -1,7 +1,7 @@
 include("./02_TestWinrate.jl")
 
 module AlphaBetaAction
-using ..AlternateMazeStateGame: AlternateMazeState, advance!, to_string, is_done, get_winning_status, legal_actions
+using ..AlternateMazeGame: AlternateMazeState, advance!, to_string, is_done, get_winning_status, legal_actions
 
 function get_score(state::AlternateMazeState)::Int
     state.characters[1].game_score - state.characters[2].game_score

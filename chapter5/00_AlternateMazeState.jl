@@ -1,4 +1,4 @@
-module AlternateMazeStateGame
+module AlternateMazeGame
 using Random: seed!, rand
 
 const DX = [-1, 1, 0, 0]
@@ -143,7 +143,7 @@ end
 
 
 module RandomAction 
-using ..AlternateMazeStateGame: AlternateMazeState, legal_actions, is_done, get_winning_status, to_string, advance!
+using ..AlternateMazeGame: AlternateMazeState, legal_actions, is_done, get_winning_status, to_string, advance!
 
 function random_action(state::AlternateMazeState)::Int
     rand(legal_actions(state))
