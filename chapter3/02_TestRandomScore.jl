@@ -1,11 +1,17 @@
-include("00_MazeState.jl")
+include("./01_Greedy.jl")
 
-function test_ai_score(game_number::Int)
+module AITester
+
+using ..MazeGame: MazeState, legal_actions, advance!, to_string, is_done, evaluate_score!
+using ..RandomAgent: random_action
+using Distributed
+
+function test_ai_score(ai::Pair, game_number::Int)
     score_mean = 0.0
-    for seed in 1:game_number
+    @sync @distributed for seed in 1:game_number
         state = MazeState(seed, 3, 4, 4)
         while !is_done(state)
-            advance!(state, random_action(state))
+            advance!(state, ai.second(state))
         end
         score_mean += state.game_score
     end
@@ -13,4 +19,7 @@ function test_ai_score(game_number::Int)
     println("score mean: $(score_mean)")
 end
 
-test_ai_score(100)
+end
+
+# ai = "random_agent" => state -> RandomAgent.random_action(state)
+# AITester.test_ai_score(ai, 100)

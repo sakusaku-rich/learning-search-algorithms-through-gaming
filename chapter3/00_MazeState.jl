@@ -1,3 +1,5 @@
+module MazeGame
+
 using Random: seed!, rand
 
 const DX = [1, -1, 0, 0]
@@ -16,6 +18,8 @@ mutable struct MazeState
     end_turn::Int
     turn::Int
     game_score::Int
+    evaluated_score::Int
+    first_action::Int
 
     function MazeState(seed::Int, h::Int, w::Int, end_turn::Int)
         seed!(seed)
@@ -31,8 +35,12 @@ mutable struct MazeState
                 end
             end
         end
-        new(points, character, h, w, end_turn, 0,  0)
+        new(points, character, h, w, end_turn, 0,  0, 0, -1)
     end
+end
+
+function evaluate_score!(state::MazeState)
+    state.evaluated_score = state.game_score
 end
 
 function is_done(state::MazeState)::Bool
@@ -80,6 +88,13 @@ function to_string(state::MazeState)::String
     ss
 end
 
+end
+
+
+module RandomAgent
+
+using ..MazeGame: MazeState, legal_actions, advance!, to_string, is_done
+
 function random_action(state::MazeState)::Int
     rand(legal_actions(state))
 end
@@ -93,3 +108,7 @@ function play_game(seed::Int, h::Int, w::Int, end_turn::Int)
         print(to_string(state))
     end
 end
+    
+end
+
+# RandomAgent.play_game(0, 10, 10, 10)
