@@ -1,7 +1,9 @@
 include("./04_TestSpeed.jl")
 
 module Util
+
 using Dates: now, Millisecond, DateTime
+
 struct TimeKeeper
     start_time::DateTime
     time_threshold::Int
@@ -9,11 +11,17 @@ struct TimeKeeper
         new(now(), time_threshold)
     end
 end
+
+function is_time_over(time_keeper::TimeKeeper)::Bool
+    now() - time_keeper.start_time > Millisecond(time_keeper.time_threshold)
 end
+
+end
+
 
 module IterativeDeepeningAction
 using ..AlternateMazeStateGame: AlternateMazeState, advance!, to_string, is_done, get_winning_status, legal_actions
-using ..Util: TimeKeeper
+using ..Util: TimeKeeper, is_time_over
 using Dates: now, Millisecond, DateTime
 
 function get_score(state::AlternateMazeState)::Int
@@ -46,10 +54,6 @@ function alpha_beta_score(state::AlternateMazeState, alpha::Int, beta::Int, dept
         end
     end
     alpha
-end
-
-function is_time_over(time_keeper::TimeKeeper)::Bool
-    now() - time_keeper.start_time > Millisecond(time_keeper.time_threshold)
 end
 
 function iterative_deepening_action(state::AlternateMazeState, time_threshold::Int)::Int
@@ -87,11 +91,11 @@ end
 
 end
 
-w = 5
-h = 5
-end_turn = 10
-ais = [
-    "iterative_deepening_action 100" => state -> IterativeDeepeningAction.iterative_deepening_action(state, 100),
-    "iterative_deepening_action 1" => state -> IterativeDeepeningAction.iterative_deepening_action(state, 1),
-]
-TestFirstPlayerWinRate.test_first_player_win_rate(w, h, end_turn, ais, 100)
+# w = 5
+# h = 5
+# end_turn = 10
+# ais = [
+#     "iterative_deepening_action 100" => state -> IterativeDeepeningAction.iterative_deepening_action(state, 100),
+#     "iterative_deepening_action 1" => state -> IterativeDeepeningAction.iterative_deepening_action(state, 1),
+# ]
+# TestFirstPlayerWinRate.test_first_player_win_rate(w, h, end_turn, ais, 100)
