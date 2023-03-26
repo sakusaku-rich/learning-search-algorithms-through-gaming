@@ -155,5 +155,5 @@ end
 
 end
 
-state = AlternateMazeStateGame.AlternateMazeState(1, 5, 5, 10)
-MCTSActionWithPrintTree.mcts_action(state, 30, 10, 1.0, true)
+# state = AlternateMazeStateGame.AlternateMazeState(1, 5, 5, 10)
+# MCTSActionWithPrintTree.mcts_action(state, 30, 10, 1.0, true)
