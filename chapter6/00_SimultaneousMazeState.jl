@@ -6,6 +6,7 @@ const DX = [-1, 1, 0, 0]
 const DY = [0, 0, 1, -1]
 
 @enum Action LEFT=1 RIGHT=2 DOWN=3 UP=4
+@enum WinningStatus FIRST=1 SECOND=2 DRAW=3 NONE=4
 
 mutable struct Character
     y::Int
@@ -55,13 +56,8 @@ end
 
 function to_string(state::SimultaneousMazeState)::String
     s = ""
-    for player_id in 1:length(state.characters)
-        if state.turn % 2 == 1
-            player_id = (player_id % 2) + 1
-        end
-        character = state.characters[player_id]
-        s *= "Player $(player_id): $(character.game_score) ($(character.x), $(character.y))\n"
-    end
+    s *= "Player 1: $(state.characters[1].game_score) ($(state.characters[1].x), $(state.characters[1].y))\n"
+    s *= "Player 2: $(state.characters[2].game_score) ($(state.characters[2].x), $(state.characters[2].y))\n"
     for h in 1:state.h
         for w in 1:state.w
             is_writeen = false
@@ -124,6 +120,19 @@ function legal_actions(state::SimultaneousMazeState, player_id::Int)::Vector{Int
         end
     end
     actions
+end
+
+function get_winning_status(state::SimultaneousMazeState)::WinningStatus
+    if is_done(state) 
+        if state.characters[1].game_score > state.characters[2].game_score
+            return FIRST
+        end
+        if state.characters[1].game_score < state.characters[2].game_score
+            return SECOND
+        end
+        return DRAW
+    end
+    NONE
 end
 
 function play_game(ais::Vector{Pair{String, Function}}, seed::Int, h::Int, w::Int, end_turn::Int)
