@@ -72,7 +72,7 @@ end
 
 
 
-module AlternateMontecarloAgent
+module MCTSAgent
 
 using ..SimultaneousMazeGame: SimultaneousMazeState
 using ..AlternateMazeGame: AlternateMazeState, legal_actions, advance!, is_done, get_winning_status, FIRST, SECOND, DRAW, NONE
@@ -193,8 +193,8 @@ end
 
 end
 
-ais = Pair{String, Function}[
-    "mcts_action" => (state::SimultaneousMazeGame.SimultaneousMazeState, player_id::Int) -> AlternateMontecarloAgent.mcts_action(state, player_id, 1000, 10, 1.0),
-    "primitive_montecarlo_action" => (state::SimultaneousMazeGame.SimultaneousMazeState, player_id::Int) -> PrimitiveMontecarloAgent.primitive_montecarlo_action(state, player_id, 1000)
-]
-FirstPlayerWinRateTester.test_first_player_win_rate(5, 5, 20, ais, 500)
+# ais = Pair{String, Function}[
+#     "mcts_action" => (state::SimultaneousMazeGame.SimultaneousMazeState, player_id::Int) -> MCTSAgent.mcts_action(state, player_id, 1000, 10, 1.0),
+#     "primitive_montecarlo_action" => (state::SimultaneousMazeGame.SimultaneousMazeState, player_id::Int) -> PrimitiveMontecarloAgent.primitive_montecarlo_action(state, player_id, 1000)
+# ]
+# FirstPlayerWinRateTester.test_first_player_win_rate(5, 5, 20, ais, 500)
