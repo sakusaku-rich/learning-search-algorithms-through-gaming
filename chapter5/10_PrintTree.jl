@@ -33,7 +33,7 @@ function primitive_montecarlo_action(state::AlternateMazeState, playout_number::
     end
     best_action_index = -1
     best_score = -floatmax(Float64)
-    for index in 1:length(actions)
+    for index in eachindex(actions)
         value_mean = values[index] / cnts[index]
         if value_mean > best_score
             best_score = value_mean
@@ -69,7 +69,7 @@ function next_child_node(node::Node, c::Float64)::Node
     end
     best_value = -floatmax(Float64)
     best_action_index = -1
-    for i in 1:length(node.child_nodes)
+    for i in eachindex(node.child_nodes)
         child_node = node.child_nodes[i]
         ucb1_value = 1.0 - child_node.w / child_node.n + c * sqrt(2.0 * log(t) / child_node.n)
         if ucb1_value > best_value
@@ -126,7 +126,7 @@ function mcts_action(
     best_action_searched_number = -1
     best_action_index = -1
     @assert length(actions) == length(root_node.child_nodes)
-    for i in 1:length(actions)
+    for i in eachindex(actions)
         n = root_node.child_nodes[i].n
         if n > best_action_searched_number
             best_action_index = i

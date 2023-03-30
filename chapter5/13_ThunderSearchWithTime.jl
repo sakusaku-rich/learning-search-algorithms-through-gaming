@@ -22,7 +22,7 @@ function thunder_search_action_with_time_threshold(state::AlternateMazeState, ti
     best_action_searched_number = -1
     best_action_index = -1
     @assert length(actions) == length(root_node.child_nodes)
-    for i in 1:length(actions)
+    for i in eachindex(actions)
         n = root_node.child_nodes[i].n
         if n > best_action_searched_number
             best_action_index = i
@@ -54,7 +54,7 @@ function mcts_action_with_time_threshold(state::AlternateMazeState, expand_thres
     best_action_searched_number = -1
     best_action_index = -1
     @assert length(actions) == length(root_node.child_nodes)
-    for i in 1:length(actions)
+    for i in eachindex(actions)
         n = root_node.child_nodes[i].n
         if n > best_action_searched_number
             best_action_index = i

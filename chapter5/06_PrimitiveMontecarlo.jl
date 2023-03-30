@@ -31,7 +31,7 @@ function primitive_montecarlo_action(state::AlternateMazeState, playout_number::
     end
     best_action_index = -1
     best_score = -floatmax(Float64)
-    for index in 1:length(actions)
+    for index in eachindex(actions)
         value_mean = values[index] / cnts[index]
         if value_mean > best_score
             best_score = value_mean

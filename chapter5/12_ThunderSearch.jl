@@ -32,7 +32,7 @@ function next_child_node(node::Node)::Node
     end
     best_value = -floatmax(Float64)
     best_action_index = -1
-    for i in 1:length(node.child_nodes)
+    for i in eachindex(node.child_nodes)
         child_node = node.child_nodes[i]
         thunder_value = 1.0 - child_node.w / child_node.n
         if thunder_value > best_value
@@ -80,7 +80,7 @@ function thunder_search_action(state::AlternateMazeState, playout_number::Int, i
     best_action_searched_number = -1
     best_action_index = -1
     @assert length(actions) == length(root_node.child_nodes)
-    for i in 1:length(actions)
+    for i in eachindex(actions)
         n = root_node.child_nodes[i].n
         if n > best_action_searched_number
             best_action_index = i

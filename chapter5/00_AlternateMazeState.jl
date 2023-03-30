@@ -88,7 +88,7 @@ end
 
 function to_string(state::AlternateMazeState)::String
     s = ""
-    for player_id in 1:length(state.characters)
+    for player_id in eachindex(state.characters)
         if state.turn % 2 == 1
             player_id = (player_id % 2) + 1
         end
@@ -98,7 +98,7 @@ function to_string(state::AlternateMazeState)::String
     for h in 1:state.h
         for w in 1:state.w
             is_writeen = false
-            for player_id in 1:length(state.characters)
+            for player_id in eachindex(state.characters)
                 if state.turn % 2 == 1
                     player_id = (player_id % 2) + 1
                 end
