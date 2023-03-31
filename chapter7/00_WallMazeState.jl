@@ -125,6 +125,10 @@ function is_done(state::WallMazeState)::Bool
     state.turn == state.end_turn
 end
 
+function evaluate!(state::WallMazeState)
+    state.evaluated_score = state.game_score
+end
+
 function play_game(seed::Int, h::Int, w::Int, end_turn::Int, ai::Pair)::Int
     state = WallMazeState(seed, h, w, end_turn)
     println(to_string(state))
