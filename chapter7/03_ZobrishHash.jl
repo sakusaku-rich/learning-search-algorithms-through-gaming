@@ -236,10 +236,6 @@ function beam_search_action(state::WallMazeState, beam_width::Int, beam_depth::I
             for action in actions
                 next_state = deepcopy(now_state)
                 advance!(next_state, action)
-                # println("****")
-                # println(t)
-                # println(next_state.hash)
-                # println(hash_check)
                 if t > 1 && next_state.hash in hash_check
                     continue
                 end
