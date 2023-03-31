@@ -11,7 +11,7 @@ function beam_search_action(state::MazeState, beam_width::Int, beam_depth::Int):
     for t in 1:beam_depth
         next_beam = []
         for i in 1:beam_width
-            if length(now_beam) == 0
+            if isempty(now_beam)
                 break
             end
             now_state = popfirst!(now_beam)

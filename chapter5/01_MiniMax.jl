@@ -14,7 +14,7 @@ function mini_max_score(state::AlternateMazeState, depth::Int)::Int
         return get_score(state)
     end
     actions = legal_actions(state)
-    if length(actions) == 0
+    if isempty(actions)
         return get_score(state)
     end
     best_score = -typemax(Int)

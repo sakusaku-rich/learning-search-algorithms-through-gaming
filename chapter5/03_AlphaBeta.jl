@@ -12,7 +12,7 @@ function alpha_beta_score(state::AlternateMazeState, alpha::Int, beta::Int, dept
         return get_score(state)
     end
     actions = legal_actions(state)
-    if length(actions) == 0
+    if isempty(actions)
         return get_score(state)
     end
     for action in actions

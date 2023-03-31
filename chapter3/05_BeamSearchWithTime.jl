@@ -36,7 +36,7 @@ function beam_search_action_with_time_threshold(state::MazeState, beam_width::In
             if is_time_over(time_keeper) && best_state.first_action != -1
                 return best_state.first_action
             end
-            if length(now_beam) == 0
+            if isempty(now_beam)
                 break
             end
             now_state = popfirst!(now_beam)

@@ -25,7 +25,7 @@ function chokudai_search_action_with_time_threshold(state::MazeState, beam_width
             now_beam = beam[t]
             next_beam = beam[t + 1]
             for i in 1:beam_width
-                if length(now_beam) == 0
+                if isempty(now_beam)
                     break
                 end
                 now_state = now_beam[1]
@@ -53,7 +53,7 @@ function chokudai_search_action_with_time_threshold(state::MazeState, beam_width
     end
 
     for t in Iterators.countfrom(beam_depth + 1, -1)
-        if length(beam[t]) > 0
+        if !isempty(beam[t])
             return beam[t][1].first_action
         end
     end

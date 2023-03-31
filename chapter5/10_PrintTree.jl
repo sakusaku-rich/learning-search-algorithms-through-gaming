@@ -93,7 +93,7 @@ function evaluate!(node::Node, expand_threshold::Int, c::Float64)::Float64
         node.n += 1
         return value
     end
-    if length(node.child_nodes) == 0
+    if isempty(node.child_nodes)
         state_copy = deepcopy(node.state)
         value = playout(state_copy)
         node.w += value

@@ -56,7 +56,7 @@ function evaluate!(node::Node)::Float64
         node.n += 1
         return value
     end
-    if length(node.child_nodes) == 0
+    if isempty(node.child_nodes)
         value = get_score_rate(node.state)
         node.w += value
         node.n += 1
@@ -101,7 +101,7 @@ function print_tree(node::Node, depth::Int = 1)
             print("__")
         end
         println(" $(i)($(child_node.n))")
-        if length(child_node.child_nodes) > 0
+        if !isempty(child_node.child_nodes)
             print_tree(child_node, depth + 1)
         end
     end
