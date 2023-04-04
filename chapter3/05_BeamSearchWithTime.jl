@@ -25,13 +25,15 @@ module BeamSearchWithTimeThresholdAgent
 
 using ..MazeGame: MazeState, advance!, to_string, is_done, legal_actions, evaluate_score!
 using ..Util: TimeKeeper, is_time_over
+using DataStructures: PriorityQueue, dequeue!
 
 function beam_search_action_with_time_threshold(state::MazeState, beam_width::Int, time_threshold::Int)::Int
     time_keeper = TimeKeeper(time_threshold)
-    now_beam = [state]
+    now_beam = PriorityQueue{MazeState, Int}(Base.Order.Reverse)
+    push!(now_beam, state => state.evaluated_score)
     best_state = state
     for t in Iterators.countfrom()
-        next_beam = []
+        next_beam = PriorityQueue{MazeState, Int}(Base.Order.Reverse)
         for i in 1:beam_width
             if is_time_over(time_keeper) && best_state.first_action != -1
                 return best_state.first_action
@@ -39,7 +41,7 @@ function beam_search_action_with_time_threshold(state::MazeState, beam_width::In
             if isempty(now_beam)
                 break
             end
-            now_state = popfirst!(now_beam)
+            now_state = dequeue!(now_beam)
             la = legal_actions(now_state)
             for action in la
                 next_state = deepcopy(now_state)
@@ -47,14 +49,12 @@ function beam_search_action_with_time_threshold(state::MazeState, beam_width::In
                 if t == 1
                     next_state.first_action = action
                 end
-                push!(next_beam, next_state)
+                evaluate_score!(next_state)
+                push!(next_beam, next_state => next_state.evaluated_score)
             end
         end
-        
-        evaluate_score!.(next_beam)
-        now_beam = sort(next_beam, by=state->state.evaluated_score, rev=true)
-        best_state = now_beam[1]
-
+        now_beam = next_beam
+        best_state = first(now_beam)[1]
         if is_done(best_state)
             break
         end

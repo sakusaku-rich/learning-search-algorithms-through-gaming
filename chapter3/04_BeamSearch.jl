@@ -4,17 +4,19 @@ include("./03_TestGreedyScore.jl")
 module BeamSearchAgent
 
 using ..MazeGame: MazeState, legal_actions, advance!, to_string, is_done, evaluate_score!
+using DataStructures: PriorityQueue, dequeue!
 
 function beam_search_action(state::MazeState, beam_width::Int, beam_depth::Int)::Int
-    now_beam = [state]
+    now_beam = PriorityQueue{MazeState, Int}(Base.Order.Reverse)
+    push!(now_beam, state => state.evaluated_score)
     best_state = state
     for t in 1:beam_depth
-        next_beam = []
+        next_beam = PriorityQueue{MazeState, Int}(Base.Order.Reverse)
         for i in 1:beam_width
             if isempty(now_beam)
                 break
             end
-            now_state = popfirst!(now_beam)
+            now_state = dequeue!(now_beam)
             la = legal_actions(now_state)
             for action in la
                 next_state = deepcopy(now_state)
@@ -22,14 +24,12 @@ function beam_search_action(state::MazeState, beam_width::Int, beam_depth::Int):
                 if t == 1
                     next_state.first_action = action
                 end
-                push!(next_beam, next_state)
+                evaluate_score!(next_state)
+                push!(next_beam, next_state => next_state.evaluated_score)
             end
         end
-        
-        evaluate_score!.(next_beam)
-        now_beam = sort(next_beam, by=state->state.evaluated_score, rev=true)
-        best_state = now_beam[1]
-
+        now_beam = next_beam
+        best_state = first(now_beam)[1]
         if is_done(best_state)
             break
         end
