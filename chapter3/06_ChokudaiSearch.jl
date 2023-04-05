@@ -29,7 +29,7 @@ function chokudai_search_action(state::MazeState, beam_width::Int, beam_depth::I
 
                 la = legal_actions(now_state)
                 @sync @distributed for action in la
-                    next_state = deepcopy(now_state)
+                    next_state = copy(now_state)
                     advance!(next_state, action)
                     if t == 1
                         next_state.first_action = action

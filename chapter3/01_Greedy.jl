@@ -5,12 +5,14 @@ module GreedyAgent
 
 using ..MazeGame: MazeState, legal_actions, advance!, to_string, is_done, evaluate_score!
 
+
+
 function greedy_action(state::MazeState)::Int
     la = legal_actions(state)
     best_score = -typemax(Int)
     best_action = -1
     for action in la
-        new_state = deepcopy(state)
+        new_state = copy(state)
         advance!(new_state, action)
         evaluate_score!(new_state)
         if new_state.evaluated_score > best_score

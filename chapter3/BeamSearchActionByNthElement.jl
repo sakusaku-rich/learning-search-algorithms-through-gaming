@@ -13,7 +13,7 @@ function beam_search_action_by_nth_element(state::MazeState, beam_width::Int, be
         for nb in now_beam
             la = legal_actions(nb)
             for action in la
-                next_state = deepcopy(nb)
+                next_state = copy(nb)
                 advance!(next_state, action)
                 if t == 1
                     next_state.first_action = action

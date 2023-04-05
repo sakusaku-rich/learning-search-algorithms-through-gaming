@@ -37,7 +37,25 @@ mutable struct MazeState
         end
         new(points, character, h, w, end_turn, 0,  0, 0, -1)
     end
+
+    function MazeState(points::Matrix{Int}, character::Coord, h::Int, w::Int, end_turn::Int, turn::Int, game_score::Int, evaluated_score::Int, first_action::Int)
+        new(points, character, h, w, end_turn, turn, game_score, evaluated_score, first_action)
+    end
 end
+
+Base.copy(coord::Coord)::Coord = Coord(coord.x, coord.y)
+
+Base.copy(state::MazeState)::MazeState = MazeState(
+    copy(state.points),
+    copy(state.character),
+    state.h,
+    state.w,
+    state.end_turn,
+    state.turn,
+    state.game_score,
+    state.evaluated_score,
+    state.first_action
+)
 
 function evaluate_score!(state::MazeState)
     state.evaluated_score = state.game_score
