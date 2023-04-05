@@ -8,6 +8,10 @@ struct Hash
     points::Array{Int64, 3}
     character::Matrix{Int64}
 
+    function Hash(points::Array{Int64, 3}, character::Matrix{Int64})
+        new(points, character)
+    end
+
     function Hash(seed::Int, h::Int, w::Int)::Hash
         seed!(seed)
         points = zeros(Int, h, w, 9)
@@ -23,6 +27,8 @@ struct Hash
         new(points, character)
     end
 end
+
+Base.copy(hash::Hash) = Hash(copy(hash.points), copy(hash.character))
 
 end
 
@@ -40,6 +46,8 @@ mutable struct Coord
     y::Int
 end
 
+Base.copy(coord::Coord) = Coord(coord.x, coord.y)
+
 mutable struct WallMazeState
     h::Int
     w::Int
@@ -53,6 +61,11 @@ mutable struct WallMazeState
     first_action::Int
     base_hash::Hash
     hash::Int
+    ref_count::Int64
+
+    function WallMazeState(h::Int, w::Int, end_turn::Int, points::Matrix{Int}, walls::Matrix{Int}, character::Coord, turn::Int, evaluated_score::Int, game_score::Int, first_action::Int, base_hash::Hash, hash::Int, ref_count::Int64)
+        new(h, w, end_turn, points, walls, copy(character), turn, evaluated_score, game_score, first_action, copy(base_hash), hash, ref_count)
+    end
 
     function WallMazeState(seed::Int, h::Int, w::Int, end_turn::Int, base_hash::Hash)
         seed!(seed)
@@ -97,10 +110,11 @@ mutable struct WallMazeState
             end
         end
         hash = init_hash(base_hash, character, points)
-        new(h, w, end_turn, points, walls, character, 0, 0, 0, 0, base_hash, hash)
+        new(h, w, end_turn, points, walls, character, 0, 0, 0, 0, base_hash, hash, 1)
     end
-
 end
+Base.copy(state::WallMazeState) = WallMazeState(state.h, state.w, state.end_turn, copy(state.points), copy(state.walls), copy(state.character), state.turn, state.evaluated_score, state.game_score, state.first_action, copy(state.base_hash), state.hash, state.ref_count)
+
 
 
 function init_hash(base_hash::Hash, character::Coord, points::Matrix{Int})::Int
@@ -218,23 +232,25 @@ end
 
 module BeamSearchWIthHashCheckAgent
 
-using ..WallMazeGame: WallMazeState, advance!, to_string, is_done, legal_actions
+using ..WallMazeGame: WallMazeState, advance!, to_string, is_done, legal_actions, copy, Coord
 using ..DistanceEvaluater: evaluate!
+using DataStructures: PriorityQueue, dequeue!
 
 function beam_search_action(state::WallMazeState, beam_width::Int, beam_depth::Int)::Int64
-    now_beam = WallMazeState[state]
+    now_beam = PriorityQueue{WallMazeState, Int}(Base.Order.Reverse)
+    push!(now_beam, state => state.evaluated_score)
     best_state = state
     hash_check = Set(Int[])
     for t in 1:beam_depth
-        next_beam = WallMazeState[]
+        next_beam = PriorityQueue{WallMazeState, Int}(Base.Order.Reverse)
         for i in beam_width
             if isempty(now_beam)
                 break
             end
-            now_state = popfirst!(now_beam)
+            now_state = dequeue!(now_beam)
             actions = legal_actions(now_state)
             for action in actions
-                next_state = deepcopy(now_state)
+                next_state = copy(now_state)
                 advance!(next_state, action)
                 if t > 1 && next_state.hash in hash_check
                     continue
@@ -243,14 +259,15 @@ function beam_search_action(state::WallMazeState, beam_width::Int, beam_depth::I
                 if t == 1
                     next_state.first_action = action
                 end
-                push!(next_beam, next_state)
+                evaluate!(next_state, state.h, state.w)
+                push!(next_beam, next_state => next_state.evaluated_score)
             end
         end
-        evaluate!.(next_beam, state.h, state.w)
-        now_beam = sort(next_beam, by=state->state.evaluated_score, rev=true)
-        if !isempty(now_beam)
-            best_state = now_beam[begin]
+        now_beam = next_beam
+        if isempty(now_beam)
+            break
         end
+        best_state = first(now_beam)[1]
         if is_done(best_state)
             break
         end
@@ -265,11 +282,12 @@ module AITester
 using ..WallMazeGame: WallMazeState, is_done, advance!
 using ..Zobrish: Hash
 using Distributed
-
+using Dates: now, Millisecond
 
 function test_ai_score(ai::Pair, game_number::Int, h::Int, w::Int, end_turn::Int, base_hash::Hash)
     score_mean = 0.0
-    @sync @distributed for seed in 1:game_number
+    for seed in 1:game_number
+    # @sync @distributed for seed in 1:game_number
         state = WallMazeState(seed, h, w, end_turn, base_hash)
         while !is_done(state)
             advance!(state, ai.second(state))
@@ -278,6 +296,21 @@ function test_ai_score(ai::Pair, game_number::Int, h::Int, w::Int, end_turn::Int
     end
     score_mean /= game_number
     println("score mean: $(score_mean)")
+end
+
+function test_ai_speed(ai::Pair, game_number::Int, per_game_number::Int, h::Int, w::Int, end_turn::Int, base_hash::Hash)
+    diff_sum = Millisecond(0)
+    for i in 1:game_number
+        state = WallMazeState(i, h, w, end_turn, base_hash)
+        start_time = now()
+        for j in 1:per_game_number
+            ai.second(state)
+        end
+        diff = now() - start_time
+        diff_sum += diff
+    end
+    time_mean = diff_sum.value / game_number
+    println("Time of $(ai.first) $(time_mean)ms")
 end
 
 end
