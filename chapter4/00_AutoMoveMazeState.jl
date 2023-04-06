@@ -1,3 +1,7 @@
+
+
+module AutoMoveMazeGame
+
 using Random: seed!, rand
 
 const H = 5
@@ -11,6 +15,8 @@ mutable struct Coord
     x::Int
     y::Int
 end
+
+Base.copy(c::Coord) = Coord(c.x, c.y)
 
 mutable struct AutoMoveMazeState
     points::Matrix{Int}
@@ -33,6 +39,32 @@ mutable struct AutoMoveMazeState
         end
         new(points, 0, characters, 0, 0)
     end
+
+    function AutoMoveMazeState(points::Matrix{Int}, turn::Int, characters::Vector{Coord}, game_score::Int, evaluated_score::Int)
+        new(points, turn, characters, game_score, evaluated_score)
+    end
+end
+
+Base.copy(state::AutoMoveMazeState) = AutoMoveMazeState(
+    copy(state.points),
+    state.turn,
+    copy(state.characters),
+    state.game_score,
+    state.evaluated_score
+)
+
+function init!(state::AutoMoveMazeState)
+    for character in state.characters
+        character.x = rand(1:W)
+        character.y = rand(1:H)
+    end
+end
+
+
+function transition!(state::AutoMoveMazeState)
+    character = state.characters[rand(1:CHARACTER_N)]
+    character.x = rand(1:W)
+    character.y = rand(1:H)
 end
 
 function set_character!(characters::Vector{Coord}, character_id::Int, x::Int, y::Int)
@@ -41,7 +73,7 @@ function set_character!(characters::Vector{Coord}, character_id::Int, x::Int, y:
 end
 
 function get_score(state::AutoMoveMazeState, is_print::Bool)
-    tmp_state = state
+    tmp_state = copy(state)
 
     for character in state.characters
         tmp_state.points[character.x, character.y] = 0
@@ -50,7 +82,7 @@ function get_score(state::AutoMoveMazeState, is_print::Bool)
     while !is_done(tmp_state)
         advance!(tmp_state)
         if is_print
-            println(println(to_string(state)))
+            println(to_string(state))
         end
     end
 
@@ -89,23 +121,12 @@ function advance!(state::AutoMoveMazeState)
     state.turn += 1
 end
 
-function random_action(state::AutoMoveMazeState)
-    now_state = deepcopy(state)
-    for character_id in 1:CHARACTER_N
-        x = rand(1:W)
-        y = rand(1:H)
-        set_character!(now_state.characters, character_id, x, y)
-    end
-    now_state
-end
-
 function is_done(state::AutoMoveMazeState)
     state.turn == END_TURN
 end
 
 function to_string(state::AutoMoveMazeState)::String
-    ss = ""
-    ss *= "turn:\t$(state.turn)\n"
+    ss = "turn:\t$(state.turn)\n"
     ss *= "score:\t$(state.game_score)\n\n"
     for h in 1:H
         for w in 1:W
@@ -137,5 +158,25 @@ function play_game(ai, seed::Int)
     println("Score of $(ai.first): $(score)")
 end
 
-ai = "random_action" => state -> random_action(state)
-play_game(ai, 0)
+end
+
+module RandomAgent
+
+using ..AutoMoveMazeGame: AutoMoveMazeState, CHARACTER_N, H, W, set_character!
+using Random
+
+function random_action(state::AutoMoveMazeState)
+    now_state = copy(state)
+    for character_id in 1:CHARACTER_N
+        x = rand(1:W)
+        y = rand(1:H)
+        set_character!(now_state.characters, character_id, x, y)
+    end
+    now_state
+end
+
+end
+
+
+# ai = "random_action" => state -> RandomAgent.random_action(state)
+# AutoMoveMazeGame.play_game(ai, 0)
