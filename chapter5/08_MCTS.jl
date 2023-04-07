@@ -1,9 +1,9 @@
 include("./07_PrimitiveMontecarloPlayoutNumber.jl")
 
-module MCTSAction
+module MCTSAgent
 
 using ..AlternateMazeGame: AlternateMazeState, advance!, to_string, is_done, get_winning_status, legal_actions
-using ..RandomAction: random_action
+using ..RandomAgent: random_action
 
 mutable struct Node
     state::AlternateMazeState
@@ -46,7 +46,7 @@ function expand!(node::Node)
         push!(
             node.child_nodes, 
             Node(
-                deepcopy(node.state)
+                copy(node.state)
             )
         )
         advance!(node.child_nodes[lastindex(node.child_nodes)].state, action)
@@ -81,7 +81,7 @@ function evaluate!(node::Node, expand_threshold::Int, c::Float64)::Float64
         return value
     end
     if isempty(node.child_nodes)
-        state_copy = deepcopy(node.state)
+        state_copy = copy(node.state)
         value = playout(state_copy)
         node.w += value
         node.n += 1
@@ -122,7 +122,7 @@ end
 # expand_threshold = 10
 # c = 1.0
 # ais = [
-#     "mcts_action 3000" => state -> MCTSAction.mcts_action(state, 3000, expand_threshold, c),
-#     "primitive_montecarlo_action 3000" => state -> PrimitiveMontecarloAction.primitive_montecarlo_action(state, 3000),
+#     "mcts_agent 3000" => state -> MCTSAgent.mcts_action(state, 3000, expand_threshold, c),
+#     "primitive_montecarlo_agent 3000" => state -> PrimitiveMontecarloAgent.primitive_montecarlo_action(state, 3000),
 # ]
 # TestFirstPlayerWinRate.test_first_player_win_rate(5, 5, 10, ais, 100)

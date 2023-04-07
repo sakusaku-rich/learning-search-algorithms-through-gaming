@@ -1,12 +1,12 @@
 include("12_ThunderSearch.jl")
 
-module ThunderSearchActionWithTimeThreshold
+module ThunderSearchAgentWithTimeThreshold
 
 using ..AlternateMazeGame: AlternateMazeState, advance!, to_string, is_done, get_winning_status, legal_actions
-using ..RandomAction: random_action
-using ..MCTSAction: Node, expand!
+using ..RandomAgent: random_action
+using ..MCTSAgent: Node, expand!
 using ..Util: TimeKeeper, is_time_over
-using ..ThunderSearchAction: next_child_node, evaluate!
+using ..ThunderSearchAgent: next_child_node, evaluate!
 
 function thunder_search_action_with_time_threshold(state::AlternateMazeState, time_threshold::Int)::Int
     root_node = Node(state)
@@ -34,10 +34,10 @@ end
 
 end
 
-module MCTSActionWithTimeThreshold
+module MCTSAgentWithTimeThreshold
 using ..AlternateMazeGame: AlternateMazeState, advance!, to_string, is_done, get_winning_status, legal_actions
-using ..RandomAction: random_action
-using ..MCTSAction: Node, expand!, next_child_node, playout
+using ..RandomAgent: random_action
+using ..MCTSAgent: Node, expand!, next_child_node, playout
 using ..Util: TimeKeeper, is_time_over
 
 function mcts_action_with_time_threshold(state::AlternateMazeState, expand_threshold::Int, c::Float64, time_threshold::Int)::Int
@@ -78,7 +78,7 @@ function evaluate!(node::Node, expand_threshold::Int, c::Float64)::Float64
         return value
     end
     if isempty(node.child_nodes)
-        state_copy = deepcopy(node.state)
+        state_copy = copy(node.state)
         value = playout(state_copy)
         node.w += value
         node.n += 1
@@ -100,7 +100,7 @@ end
 # time_threshold = 10
 # expand_threshold = 10
 # ais = [ 
-#     "thunder_search_action_with_time_threshold 1ms" => (state) -> ThunderSearchActionWithTimeThreshold.thunder_search_action_with_time_threshold(state, time_threshold),
-#     "mcts_action_with_time_threshold 1ms" => (state) -> MCTSActionWithTimeThreshold.mcts_action_with_time_threshold(state, expand_threshold, 1.0, time_threshold)
+#     "thunder_search_agent_with_time_threshold 1ms" => (state) -> ThunderSearchAgentWithTimeThreshold.thunder_search_action_with_time_threshold(state, time_threshold),
+#     "mcts_agent_with_time_threshold 1ms" => (state) -> MCTSAgentWithTimeThreshold.mcts_action_with_time_threshold(state, expand_threshold, 1.0, time_threshold)
 # ]
 # TestFirstPlayerWinRate.test_first_player_win_rate(5, 5, 10, ais, 100)

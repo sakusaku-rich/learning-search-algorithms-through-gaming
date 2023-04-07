@@ -3,7 +3,7 @@ include("./01_MiniMax.jl")
 
 module TestFirstPlayerWinRate
 using ..AlternateMazeGame: AlternateMazeState, advance!, to_string, is_done, get_winning_status, legal_actions
-using ..MiniMaxAction: mini_max_action
+using ..MiniMaxAgent: mini_max_action
 
 function is_first_player(state::AlternateMazeState)::Bool
     state.turn % 2 == 0
@@ -39,7 +39,7 @@ function test_first_player_win_rate(
     for seed in 1:game_number
         base_state = AlternateMazeState(seed, h, w, end_turn)
         for j in [1,2]
-            state = deepcopy(base_state)
+            state = copy(base_state)
             first_ai = ais[j]
             second_ai = ais[j % 2 + 1]
             while true
@@ -68,7 +68,7 @@ end
 
 # end_turn = 4
 # ais = [
-#     "mini_max_action" => state -> MiniMaxAction.mini_max_action(state, end_turn),
-#     "random_action" => state -> RandomAction.random_action(state)
+#     "mini_max_agent" => state -> MiniMaxAgent.mini_max_action(state, end_turn),
+#     "random_agent" => state -> RandomAgent.random_action(state)
 # ]
 # TestFirstPlayerWinRate.test_first_player_win_rate(3, 3, end_turn, ais, 100)

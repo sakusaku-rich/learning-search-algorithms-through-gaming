@@ -1,8 +1,8 @@
 include("./05_IterativeDeepening.jl")
 
-module PrimitiveMontecarloAction
+module PrimitiveMontecarloAgent
 using ..AlternateMazeGame: AlternateMazeState, advance!, to_string, is_done, get_winning_status, legal_actions
-using ..RandomAction: random_action
+using ..RandomAgent: random_action
 
 function playout(state::AlternateMazeState)::Float64
     winning_status = get_winning_status(state)
@@ -24,7 +24,7 @@ function primitive_montecarlo_action(state::AlternateMazeState, playout_number::
     cnts = repeat([0], length(actions))
     for cnt in 1:playout_number
         index = mod(cnt, length(actions)) + 1
-        next_state = deepcopy(state)
+        next_state = copy(state)
         advance!(next_state, actions[index])
         values[index] += 1.0 - playout(next_state)
         cnts[index] += 1
@@ -47,7 +47,7 @@ end
 # h = 5
 # end_turn = 10
 # ais = [
-#     "primitive_montecarlo_action 3000" => state -> PrimitiveMontecarloAction.primitive_montecarlo_action(state, 3000),
-#     "random_action" => state -> RandomAction.random_action(state),
+#     "primitive_montecarlo_agent 3000" => state -> PrimitiveMontecarloAgent.primitive_montecarlo_action(state, 3000),
+#     "random_agent" => state -> RandomAgent.random_action(state),
 # ]
 # TestFirstPlayerWinRate.test_first_player_win_rate(w, h, end_turn, ais, 100)

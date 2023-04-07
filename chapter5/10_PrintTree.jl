@@ -1,10 +1,10 @@
 include("./09_MCTSPlayoutNumber.jl")
 
-module MCTSActionWithPrintTree
+module MCTSAgentWithPrintTree
 
 using ..AlternateMazeGame: AlternateMazeState, advance!, to_string, is_done, get_winning_status, legal_actions
-using ..RandomAction: random_action
-using ..MCTSAction: Node
+using ..RandomAgent: random_action
+using ..MCTSAgent: Node
 
 function playout(state::AlternateMazeState)::Float64
     winning_status = get_winning_status(state)
@@ -26,7 +26,7 @@ function primitive_montecarlo_action(state::AlternateMazeState, playout_number::
     cnts = repeat([0], length(actions))
     for cnt in 1:playout_number
         index = mod(cnt, length(actions)) + 1
-        next_state = deepcopy(state)
+        next_state = copy(state)
         advance!(next_state, actions[index])
         values[index] += 1.0 - playout(next_state)
         cnts[index] += 1
@@ -50,7 +50,7 @@ function expand!(node::Node)
         push!(
             node.child_nodes, 
             Node(
-                deepcopy(node.state)
+                copy(node.state)
             )
         )
         advance!(node.child_nodes[lastindex(node.child_nodes)].state, action)
@@ -94,7 +94,7 @@ function evaluate!(node::Node, expand_threshold::Int, c::Float64)::Float64
         return value
     end
     if isempty(node.child_nodes)
-        state_copy = deepcopy(node.state)
+        state_copy = copy(node.state)
         value = playout(state_copy)
         node.w += value
         node.n += 1
@@ -156,4 +156,4 @@ end
 end
 
 # state = AlternateMazeGame.AlternateMazeState(1, 5, 5, 10)
-# MCTSActionWithPrintTree.mcts_action(state, 30, 10, 1.0, true)
+# MCTSAgentWithPrintTree.mcts_action(state, 30, 10, 1.0, true)

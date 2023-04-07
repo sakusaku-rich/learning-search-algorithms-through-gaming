@@ -12,8 +12,12 @@ mutable struct Character
     function Character(x::Int, y::Int, game_score::Int=0)
         new(x, y, game_score)
     end
+    function Character(character::Character)
+        new(character.x, character.y, character.game_score)
+    end
 end
-
+Base.copy(c::Character) = Character(c.x, c.y, c.game_score)
+Base.copy(characters::Vector{Character}) = Character.(characters)
 
 mutable struct AlternateMazeState
     h::Int
@@ -49,7 +53,26 @@ mutable struct AlternateMazeState
         end
         new(h, w, points, end_turn, 0, characters)
     end
+    function AlternateMazeState(
+        h::Int,
+        w::Int,
+        points::Matrix{Int},
+        end_turn::Int,
+        turn::Int,
+        characters::Vector{Character}
+    )
+        new(h, w, points, end_turn, turn, characters)
+    end
 end
+
+Base.copy(state::AlternateMazeState) = AlternateMazeState(
+    state.h,
+    state.w,
+    copy(state.points),
+    state.end_turn,
+    state.turn,
+    copy(state.characters)
+)
 
 function is_done(state::AlternateMazeState)::Bool
     state.turn == state.end_turn
@@ -61,7 +84,7 @@ function legal_actions(state::AlternateMazeState)::Vector{Int}
     for action in 1:4
         tx = character.x + DX[action]
         ty = character.y + DY[action]
-        if tx >= 1 && tx <= state.w && ty >= 1 && ty <= state.h
+        if 1 <= tx <= state.w && 1 <= ty <= state.h
             push!(actions, action)
         end
     end
@@ -138,22 +161,11 @@ function advance!(state::AlternateMazeState, action::Int)
     swap_characters!(state.characters)
 end
 
-export AlternateMazeState, legal_actions, is_done, get_winning_status, to_string, advance!
-end
-
-
-module RandomAction 
-using ..AlternateMazeGame: AlternateMazeState, legal_actions, is_done, get_winning_status, to_string, advance!
-
-function random_action(state::AlternateMazeState)::Int
-    rand(legal_actions(state))
-end
-
-function play_game(seed::Int, h::Int, w::Int, end_turn::Int)
+function play_game(seed::Int, ais::Vector{Pair{String, Function}}, h::Int, w::Int, end_turn::Int)
     state = AlternateMazeState(seed, h, w, end_turn)
     while !is_done(state)
         println("1p ----")
-        action = random_action(state)
+        action = ais[1].second(state)
         println("action: $(action)")
         advance!(state, action)
         println(to_string(state))
@@ -170,7 +182,7 @@ function play_game(seed::Int, h::Int, w::Int, end_turn::Int)
             end
         end
         println("2p ----")
-        action = random_action(state)
+        action = ais[2].second(state)
         println("action: $(action)")
         advance!(state, action)
         println(to_string(state))
@@ -188,7 +200,22 @@ function play_game(seed::Int, h::Int, w::Int, end_turn::Int)
         end
     end
 end
-    
+
 end
 
-# RandomAction.play_game(0, 3, 3, 4)
+
+
+module RandomAgent
+using ..AlternateMazeGame: AlternateMazeState, legal_actions, is_done, get_winning_status, to_string, advance!
+
+function random_action(state::AlternateMazeState)::Int
+    rand(legal_actions(state))
+end
+ 
+end
+
+# ais::Vector{Pair{String, Function}} = [
+#     "random_agent1" => state -> RandomAgent.random_action(state),
+#     "random_agent2" => state -> RandomAgent.random_action(state)
+# ]
+# AlternateMazeGame.play_game(0, ais, 3, 3, 4)

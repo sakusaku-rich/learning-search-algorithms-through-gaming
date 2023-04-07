@@ -16,7 +16,7 @@ function alpha_beta_score(state::AlternateMazeState, alpha::Int, beta::Int, dept
         return get_score(state)
     end
     for action in actions
-        next_state = deepcopy(state)
+        next_state = copy(state)
         advance!(next_state, action)
         score = -alpha_beta_score(next_state, -beta, -alpha, depth - 1)
         if score > alpha
@@ -34,7 +34,7 @@ function alpha_beta_action(state::AlternateMazeState, depth::Int)::Int
     alpha = -typemax(Int)
     beta = typemax(Int)
     for action in legal_actions(state)
-        next_state = deepcopy(state)
+        next_state = copy(state)
         advance!(next_state, action)
         score = -alpha_beta_score(next_state, -beta, -alpha, depth)
         if score > alpha
@@ -49,7 +49,7 @@ end
 
 # end_turn = 4
 # ais = [
-#     "mini_max_action" => state -> MiniMaxAction.mini_max_action(state, end_turn),
-#     "alpha_beta_action" => state -> AlphaBetaAction.alpha_beta_action(state, end_turn),
+#     "mini_max_agent" => state -> MiniMaxAction.mini_max_action(state, end_turn),
+#     "alpha_beta_agent" => state -> AlphaBetaAction.alpha_beta_action(state, end_turn),
 # ]
 # TestFirstPlayerWinRate.test_first_player_win_rate(3, 3, end_turn, ais, 100)

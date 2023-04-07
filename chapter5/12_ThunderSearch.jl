@@ -1,10 +1,10 @@
 include("./11_PrintTree_3000.jl")
 
-module ThunderSearchAction
+module ThunderSearchAgent
 
 using ..AlternateMazeGame: AlternateMazeState, advance!, to_string, is_done, get_winning_status, legal_actions
-using ..RandomAction: random_action
-using ..MCTSAction: Node
+using ..RandomAgent: random_action
+using ..MCTSAgent: Node
 
 function expand!(node::Node)
     actions = legal_actions(node.state)
@@ -13,7 +13,7 @@ function expand!(node::Node)
         push!(
             node.child_nodes, 
             Node(
-                deepcopy(node.state)
+                copy(node.state)
             )
         )
         advance!(node.child_nodes[lastindex(node.child_nodes)].state, action)
@@ -117,7 +117,7 @@ end
 end
 
 # ais = [ 
-#     "thunder_search_action" => (state) -> ThunderSearchAction.thunder_search_action(state, 300, false),
-#     "mcts_action" => (state) -> MCTSAction.mcts_action(state, 300, 10, 1.0),
+#     "thunder_search_agent" => (state) -> ThunderSearchAgent.thunder_search_action(state, 300, false),
+#     "mcts_agent" => (state) -> MCTSAgent.mcts_action(state, 300, 10, 1.0),
 # ]
 # TestFirstPlayerWinRate.test_first_player_win_rate(5, 5, 10, ais, 100)

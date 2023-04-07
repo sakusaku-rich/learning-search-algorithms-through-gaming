@@ -1,9 +1,9 @@
 include("./00_AlternateMazeState.jl")
 
-module MiniMaxAction
+module MiniMaxAgent
 
 using ..AlternateMazeGame: AlternateMazeState, advance!, to_string, is_done, get_winning_status, legal_actions
-using ..RandomAction: random_action
+using ..RandomAgent: random_action
 
 function get_score(state::AlternateMazeState)::Int
     state.characters[1].game_score - state.characters[2].game_score
@@ -19,7 +19,7 @@ function mini_max_score(state::AlternateMazeState, depth::Int)::Int
     end
     best_score = -typemax(Int)
     for action in actions
-        next_state = deepcopy(state)
+        next_state = copy(state)
         advance!(next_state, action)
         score = -mini_max_score(next_state, depth - 1)
         if score > best_score
@@ -33,7 +33,7 @@ function mini_max_action(state::AlternateMazeState, depth::Int)::Int
     best_action = -1
     best_score = -typemax(Int)
     for action in legal_actions(state)
-        next_state = deepcopy(state)
+        next_state = copy(state)
         advance!(next_state, action)
         score = -mini_max_score(next_state, depth - 1)
         if score > best_score
@@ -44,46 +44,11 @@ function mini_max_action(state::AlternateMazeState, depth::Int)::Int
     best_action
 end
 
-function play_game(seed::Int, h::Int, w::Int, end_turn::Int)
-    state = AlternateMazeState(seed, h, w, end_turn)
-    while !is_done(state)
-        println("1p ----")
-        action = mini_max_action(state, end_turn)
-        println("action: $(action)")
-        advance!(state, action)
-        println(to_string(state))
-        if is_done(state)
-            if get_winning_status(state) == 1
-                println("winner: 1p")
-                break
-            elseif get_winning_status(state) == 2
-                println("winner: 2p")
-                break
-            else
-                println("DRAW")
-                break
-            end
-        end
-        println("2p ----")
-        action = random_action(state)
-        println("action: $(action)")
-        advance!(state, action)
-        println(to_string(state))
-        if is_done(state)
-            if get_winning_status(state) == 1
-                println("winner: 1p")
-                break
-            elseif get_winning_status(state) == 2
-                println("winner: 2p")
-                break
-            else
-                println("DRAW")
-                break
-            end
-        end
-    end
 end
 
-end
-
-# MiniMaxAction.play_game(0, 3, 3, 4)
+# end_turn = 4
+# ais::Vector{Pair{String, Function}} = [
+#     "mini_max_agent" => state -> MiniMaxAgent.mini_max_action(state, end_turn),
+#     "random_agent" => state -> RandomAgent.random_action(state)
+# ]
+# AlternateMazeGame.play_game(0, ais, 3, 3, end_turn)

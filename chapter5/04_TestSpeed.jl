@@ -2,7 +2,7 @@ include("./03_AlphaBeta.jl")
 
 module ExecutionSpeedCalculator
 using ..AlternateMazeGame: AlternateMazeState, advance!, to_string, is_done, get_winning_status, legal_actions
-using ..RandomAction: random_action
+using ..RandomAgent: random_action
 using Random: seed!
 using Dates: now, Millisecond, DateTime
 
@@ -34,10 +34,10 @@ end
 # end_turn = 10
 # states = ExecutionSpeedCalculator.get_sample_states(100, 3, 3, end_turn)
 # ExecutionSpeedCalculator.calculate_execution_speed(
-#     "alpha_beta_action" => state -> AlphaBetaAction.alpha_beta_action(state, end_turn),
+#     "alpha_beta_agent" => state -> AlphaBetaAction.alpha_beta_action(state, end_turn),
 #     states
 # )
 # ExecutionSpeedCalculator.calculate_execution_speed(
-#     "mini_max_action" => state -> MiniMaxAction.mini_max_action(state, end_turn),
+#     "mini_max_agent" => state -> MiniMaxAction.mini_max_action(state, end_turn),
 #     states
 # )
