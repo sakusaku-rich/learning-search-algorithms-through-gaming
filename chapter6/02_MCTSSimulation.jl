@@ -22,7 +22,27 @@ mutable struct AlternateMazeState
             base_state.h,
         )
     end
+
+    function AlternateMazeState(
+        end_turn::Int, 
+        points::Matrix{Int}, 
+        turn::Int, 
+        characters::Vector{Character},
+        w::Int,
+        h::Int,
+    )
+        new(end_turn, points, turn, characters, w, h)
+    end
 end
+
+Base.copy(state::AlternateMazeState) = AlternateMazeState(
+    state.end_turn, 
+    copy(state.points), 
+    state.turn, 
+    copy(state.characters),
+    state.w,
+    state.h,
+)
 
 function is_done(state::AlternateMazeState)::Bool
     state.turn == state.end_turn
@@ -124,7 +144,7 @@ function evaluate!(node::Node, expand_threshold::Int, c::Float64)::Float64
     end
 
     if isempty(node.child_nodes)
-        state_copy = deepcopy(node.state)
+        state_copy = copy(node.state)
         value = playout(state_copy)
         node.w += value
         node.n += 1
@@ -143,7 +163,7 @@ end
 function expand!(node::Node)
     empty!(node.child_nodes)
     for action in legal_actions(node.state)
-        push!(node.child_nodes, Node(deepcopy(node.state)))
+        push!(node.child_nodes, Node(copy(node.state)))
         advance!(node.child_nodes[lastindex(node.child_nodes)].state, action)
     end
 end
@@ -194,7 +214,7 @@ end
 end
 
 # ais = Pair{String, Function}[
-#     "mcts_action" => (state::SimultaneousMazeGame.SimultaneousMazeState, player_id::Int) -> MCTSAgent.mcts_action(state, player_id, 1000, 10, 1.0),
-#     "primitive_montecarlo_action" => (state::SimultaneousMazeGame.SimultaneousMazeState, player_id::Int) -> PrimitiveMontecarloAgent.primitive_montecarlo_action(state, player_id, 1000)
+#     "mcts_agent" => (state::SimultaneousMazeGame.SimultaneousMazeState, player_id::Int) -> MCTSAgent.mcts_action(state, player_id, 1000, 10, 1.0),
+#     "primitive_montecarlo_agent" => (state::SimultaneousMazeGame.SimultaneousMazeState, player_id::Int) -> PrimitiveMontecarloAgent.primitive_montecarlo_action(state, player_id, 1000)
 # ]
 # FirstPlayerWinRateTester.test_first_player_win_rate(5, 5, 20, ais, 500)

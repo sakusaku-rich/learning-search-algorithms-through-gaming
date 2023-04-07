@@ -26,7 +26,7 @@ function primitive_montecarlo_action(state::SimultaneousMazeState, player_id::In
     for i in eachindex(my_legal_actions)
         value = 0.0
         for j in 1:playout_number
-            next_state = deepcopy(state)
+            next_state = copy(state)
             if player_id == 1
                 advance!(next_state, my_legal_actions[i], rand(opp_legal_actions))
             else
@@ -92,7 +92,7 @@ end
 end
 
 # ais = Pair{String, Function}[
-#     "primitive_montecarlo_action" => (state::SimultaneousMazeGame.SimultaneousMazeState, player_id::Int) -> PrimitiveMontecarloAgent.primitive_montecarlo_action(state, player_id, 1000),
-#     "random_action" => (state::SimultaneousMazeGame.SimultaneousMazeState, player_id::Int) -> RandomAgent.random_action(state, player_id),
+#     "primitive_montecarlo_agent" => (state::SimultaneousMazeGame.SimultaneousMazeState, player_id::Int) -> PrimitiveMontecarloAgent.primitive_montecarlo_action(state, player_id, 1000),
+#     "random_agent" => (state::SimultaneousMazeGame.SimultaneousMazeState, player_id::Int) -> RandomAgent.random_action(state, player_id),
 # ]
 # FirstPlayerWinRateTester.test_first_player_win_rate(5, 5, 20, ais, 500)

@@ -42,7 +42,7 @@ function expand!(node::Node)
     for action1 in actions1
         push!(node.child_nodeses, Node[])
         for action2 in actions2
-            push!(node.child_nodeses[end], Node(deepcopy(node.state)))
+            push!(node.child_nodeses[end], Node(copy(node.state)))
             advance!(node.child_nodeses[end][end].state, action1, action2)
         end
     end
@@ -116,7 +116,7 @@ function evaluate!(node::Node, expand_threshold::Int, c::Float64)::Float64
     end
 
     if isempty(node.child_nodeses)
-        state_copy = deepcopy(node.state)
+        state_copy = copy(node.state)
         value = playout(state_copy)
         node.w += value
         node.n += 1
@@ -176,8 +176,8 @@ end
 
 end
 
-ais = Pair{String, Function}[
-    "duct_action" => (state::SimultaneousMazeGame.SimultaneousMazeState, player_id::Int) -> DUCTAgent.duct_action(state, player_id, 1000, 5, 1.0),
-    "mcts_action" => (state::SimultaneousMazeGame.SimultaneousMazeState, player_id::Int) -> MCTSAgent.mcts_action(state, player_id, 1000, 5, 1.0),
-]
-FirstPlayerWinRateTester.test_first_player_win_rate(5, 5, 20, ais, 500)
+# ais = Pair{String, Function}[
+#     "duct_action" => (state::SimultaneousMazeGame.SimultaneousMazeState, player_id::Int) -> DUCTAgent.duct_action(state, player_id, 1000, 5, 1.0),
+#     "mcts_action" => (state::SimultaneousMazeGame.SimultaneousMazeState, player_id::Int) -> MCTSAgent.mcts_action(state, player_id, 1000, 5, 1.0),
+# ]
+# FirstPlayerWinRateTester.test_first_player_win_rate(5, 5, 20, ais, 500)

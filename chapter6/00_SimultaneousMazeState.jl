@@ -16,6 +16,10 @@ mutable struct Character
     function Character(y::Int, x::Int, game_score::Int=0)
         new(y, x, game_score)
     end
+
+    function Character(character::Character)
+        new(character.y, character.x, character.game_score)
+    end
 end
 
 mutable struct SimultaneousMazeState
@@ -48,7 +52,18 @@ mutable struct SimultaneousMazeState
         end
         new(h, w, points, 0, characters, end_turn)
     end
+
+    function SimultaneousMazeState(
+        h::Int, w::Int, points::Matrix{Int}, turn::Int, characters::Vector{Character}, end_turn::Int
+    )
+        new(h, w, points, turn, characters, end_turn)
+    end
 end
+
+Base.copy(characters::Vector{Character}) = Character.(characters)
+Base.copy(state::SimultaneousMazeState) = SimultaneousMazeState(
+    state.h, state.w, copy(state.points), state.turn, copy(state.characters), state.end_turn
+)
 
 function is_done(state::SimultaneousMazeState)::Bool
     state.turn == state.end_turn
@@ -163,7 +178,7 @@ end
 end
 
 # ais = Pair{String, Function}[
-#     "random_action" => (state, player_id) -> RandomAgent.random_action(state, player_id),
-#     "random_action" => (state, player_id) -> RandomAgent.random_action(state, player_id)
+#     "random_agent1" => (state, player_id) -> RandomAgent.random_action(state, player_id),
+#     "random_agent2" => (state, player_id) -> RandomAgent.random_action(state, player_id)
 # ]
 # SimultaneousMazeGame.play_game(ais, 0, 3, 3, 4)
