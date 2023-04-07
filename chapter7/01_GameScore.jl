@@ -17,7 +17,7 @@ function beam_search_action(state::WallMazeState, beam_width::Int, beam_depth::I
             now_state = dequeue!(now_beam)
             actions = legal_actions(now_state)
             for action in actions
-                next_state = deepcopy(now_state)
+                next_state = copy(now_state)
                 advance!(next_state, action)
                 if t == 1
                     next_state.first_action = action

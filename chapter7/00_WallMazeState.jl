@@ -8,7 +8,11 @@ const DY = [0, 0, 1, -1]
 mutable struct Coord
     x::Int
     y::Int
+    function Coord(x::Int, y::Int)
+        new(x, y)
+    end
 end
+Base.copy(coord::Coord) = Coord(coord.x, coord.y)
 
 mutable struct WallMazeState
     h::Int
@@ -67,8 +71,17 @@ mutable struct WallMazeState
         new(h, w, end_turn, points, walls, character, 0, 0, 0, 0)
     end
 
+    function WallMazeState(
+        h::Int, w::Int, end_turn::Int, points::Matrix{Int}, walls::Matrix{Int}, character::Coord, turn::Int, evaluated_score::Int, game_score::Int, first_action::Int
+    )
+        new(h, w, end_turn, points, walls, character, turn, evaluated_score, game_score, first_action)
+    end
+
 end
 
+Base.copy(state::WallMazeState) = WallMazeState(
+    state.h, state.w, state.end_turn, copy(state.points), copy(state.walls), copy(state.character), state.turn, state.evaluated_score, state.game_score, state.first_action
+)
 
 function legal_actions(state::WallMazeState)::Vector{Int}
     actions = Int[]
