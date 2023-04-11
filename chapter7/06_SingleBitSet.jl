@@ -3,36 +3,36 @@ include("03_ZobrishHash.jl")
 module SingleBitSet
 
 using ..Zobrish: Hash
-using ..WallMazeGame: Coord, WallMazeState, DX, DY, init_hash, advance!, legal_actions, is_done
+using ..WallMazeGame: Coord, WallMazeState, DX, DY, init_hash, advance!, legal_actions, is_done, to_string
 using Distributed
 using Dates: now, Millisecond
 using DataStructures: PriorityQueue, dequeue!, enqueue!
 
 mutable struct Mat
-    bits::BitVector
+    bits::UInt64
     w::Int
     h::Int
     function Mat(h::Int, w::Int)
-        new(falses(h * w), w, h)
+        new(0, w, h)
     end
 
-    function Mat(bits::BitVector, w::Int, h::Int)
+    function Mat(bits::UInt64, w::Int, h::Int)
         new(bits, w, h)
     end
 end
 
-Base.copy(mat::Mat) = Mat(copy(mat.bits), mat.w, mat.h)
+Base.copy(mat::Mat) = Mat(mat.bits, mat.w, mat.h)
 
 function get(mat::Mat, y::Int, x::Int)::Bool
-    mat.bits[(y - 1) * mat.w + x]
+    mat.bits & (1 << ((y - 1) * mat.w + x - 1)) != 0
 end
 
 function set!(mat::Mat, y::Int, x::Int)
-    mat.bits[(y - 1) * mat.w + x] = true
+    mat.bits |= 2 ^ ((y - 1) * mat.w + x - 1)
 end
 
 function del!(mat::Mat, y::Int, x::Int)
-    mat.bits[(y - 1) * mat.w + x] = false
+    mat.bits &= ~(1 << ((y - 1) * mat.w + x - 1))
 end
 
 function up_mat(mat::Mat)::Mat
@@ -47,33 +47,35 @@ function down_mat(mat::Mat)::Mat
     ret
 end
 
-function init_left_mask(w::Int, h::Int)::BitVector
-    ret = trues(w * h)
+function init_left_mask(w::Int, h::Int)::UInt64
+    ret::UInt64 = 0
     for y in 1:h
-        ret[(y - 1) * w + 1] = false
+        ret |= (2^(w-1)) << ((y-1) * w)
     end
+    ret ⊻= 2^(w * h) - 1
     ret
 end
 
-function init_right_mask(w::Int, h::Int)::BitVector
-    ret = trues(w * h)
+function init_right_mask(w::Int, h::Int)::UInt64
+    ret::UInt64 = 0
     for y in 1:h
-        ret[y * w] = false
+        ret |= 1 << ((y-1) * w)
     end
+    ret ⊻= 2^(w * h) - 1
     ret
 end
 
 function left_mat(mat::Mat)::Mat
     left_mask = init_left_mask(mat.w, mat.h)
     ret_mat = copy(mat)
-    ret_mat.bits .|= (ret_mat.bits .& left_mask) << 1
+    ret_mat.bits |= (ret_mat.bits & left_mask) << 1
     ret_mat
 end
 
 function right_mat(mat::Mat)::Mat
     right_mask = init_right_mask(mat.w, mat.h)
     ret_mat = copy(mat)
-    ret_mat.bits .|= (ret_mat.bits .& right_mask) >> 1
+    ret_mat.bits |= (ret_mat.bits & right_mask) >> 1
     ret_mat    
 end
 
@@ -82,14 +84,14 @@ function expand!(mat::Mat)
     down = down_mat(mat)
     left = left_mat(mat)
     right = right_mat(mat)
-    mat.bits .|= up.bits
-    mat.bits .|= down.bits
-    mat.bits .|= left.bits
-    mat.bits .|= right.bits
+    mat.bits |= up.bits
+    mat.bits |= down.bits
+    mat.bits |= left.bits
+    mat.bits |= right.bits
 end
 
 function andeq_not!(mat1::Mat, mat2::Mat)
-    mat1.bits .&= .!mat2.bits
+    mat1.bits &= ~mat2.bits
 end
 
 function is_equal(mat1::Mat, mat2::Mat)::Bool
@@ -97,7 +99,7 @@ function is_equal(mat1::Mat, mat2::Mat)::Bool
 end
 
 function is_any_equal(mat1::Mat, mat2::Mat)::Bool
-    any(mat1.bits .& mat2.bits)
+    mat1.bits & mat2.bits != 0
 end
 
 mutable struct MazeStateByBitSet
@@ -122,7 +124,8 @@ mutable struct MazeStateByBitSet
     end
 end
 
-# 0.000001 seconds (4 allocations: 400 bytes)
+
+
 function get_distance_to_nearest_point(state::MazeStateByBitSet)::Int
     now_mat = Mat(state.base_state.h, state.base_state.w)
     set!(now_mat, state.base_state.character.y, state.base_state.character.x)
@@ -201,7 +204,6 @@ end
 function test_ai_score(ai::Pair, game_number::Int, h::Int, w::Int, end_turn::Int, base_hash::Hash)
     score_mean = 0.0
     for seed in 1:game_number
-        # @sync @distributed for seed in 1:game_number
         state = WallMazeState(seed, h, w, end_turn, base_hash)
         while !is_done(state)
             advance!(state, ai.second(state))
@@ -214,12 +216,12 @@ end
 
 end
 
-# h = 7
-# w = 7
-# end_turn = 49
-# beam_width = 100
-# beam_depth = end_turn
-# base_hash = Zobrish.Hash(0, h, w)
-# ai = "bit_beam_search_agent" => state -> SingleBitSet.beam_search_action(state, beam_width, beam_depth)
-# SingleBitSet.test_ai_score(ai, 100, h, w, end_turn, base_hash)
-# SingleBitSet.test_ai_speed(ai, 100, 10, h, w, end_turn, base_hash)
+h = 7
+w = 7
+end_turn = 49
+beam_width = 100
+beam_depth = end_turn
+base_hash = Zobrish.Hash(0, h, w)
+ai = "bit_beam_search_agent" => state -> SingleBitSet.beam_search_action(state, beam_width, beam_depth)
+SingleBitSet.test_ai_score(ai, 100, h, w, end_turn, base_hash)
+SingleBitSet.test_ai_speed(ai, 100, 10, h, w, end_turn, base_hash)
